@@ -1,0 +1,125 @@
+# Video Game Sales Analysis in R
+
+Going to use R, mostly dpylr and tidyverse libraries to analyze video game sales data set and check original hypothesis'
+
+```{r}
+
+vg_sales <- read_csv('vgsales.csv')
+```
+
+Query #1: Finding top selling publishers
+
+```{r}
+top_selling_publishers <- vg_sales %>%
+    group_by(Publisher) %>%
+    summarise(sum(NA_Sales), sum(EU_Sales), sum(JP_Sales), sum(Other_Sales), 'Total_Sales' = sum(Global_Sales)) %>%
+    arrange(desc(Total_Sales), .by_group = TRUE)
+
+View(top_selling_publishers)
+
+
+```
+
+Query #2: Finding top selling platforms
+
+```{r}
+top_selling_platforms <- vg_sales %>%
+    group_by(Platform) %>%
+    summarise(sum(NA_Sales), sum(EU_Sales), sum(JP_Sales), sum(Other_Sales), 'Total_Sales' = sum(Global_Sales)) %>%
+    arrange(desc(Total_Sales), .by_group = TRUE)
+
+View(top_selling_platforms)
+```
+
+Query #3: Finding top selling genres
+
+```{r}
+top_selling_genres <- vg_sales %>%
+    group_by(Genre) %>%
+    summarise(sum(NA_Sales), sum(EU_Sales), sum(JP_Sales), sum(Other_Sales), Total_Sales = sum(Global_Sales)) %>%
+    arrange(desc(Total_Sales), .by_group = TRUE)
+
+View(top_selling_genres)
+```
+
+Query #4: Finding top selling years, as well as a look at industry growth over twenty years
+
+```{r}
+industry_growth <- filter(vg_sales, (Year == 2015.0) | (Year == 1995.0)) %>%
+    group_by(Year) %>%
+    summarise(sum(NA_Sales), sum(EU_Sales), sum(JP_Sales), sum(Other_Sales), Total_Sales = sum(Global_Sales)) %>%
+    arrange(desc(Total_Sales), .by_group = TRUE)
+    
+
+
+top_selling_years <- vg_sales %>%
+    group_by(Year) %>%
+    summarise(sum(NA_Sales), sum(EU_Sales), sum(JP_Sales), sum(Other_Sales), Total_Sales = sum(Global_Sales)) %>%
+    arrange(desc(Total_Sales), .by_group = TRUE)
+
+
+
+#View(top_selling_years)
+View(industry_growth)
+# ^ you could plug in any two years in industry growth variable to change snapshot view
+```
+
+Query #5: Finding with region is responsible for most selling most video games
+
+```{r}
+top_selling_regions <- vg_sales %>%
+    summarise('North_America' = sum(NA_Sales), 'Europe' = sum(EU_Sales), 'Japan' = sum(JP_Sales), 'Other' = sum(Other_Sales))
+
+View(top_selling_regions)
+```
+
+Query #6: Finding top 5 franchises for different popular platforms
+
+You can run each code block below as many times as you want using different title variation in the grepl() pattern argument to see the different games in a franchise series and then lifetime global sales of that franchise is given as an output as well
+
+Top Nintendo:
+
+```{r}
+nintendo_top_games <- filter(vg_sales, Publisher == 'Nintendo')
+nintendo_franchise_catalog <- filter(vg_sales, grepl('Mario Kart', Name) & (Publisher == 'Nintendo'))
+
+
+View(nintendo_top_games)
+#View(nintendo_franchise_catalog)
+#sum(nintendo_franchise_catalog$Global_Sales)
+```
+
+Top Playstation:
+
+```{r}
+playstation_top_games <- filter(vg_sales, substr(Platform, 1, 2) == 'PS')
+playstation_franchise_catalog <- filter(vg_sales, grepl('Spyro', Name) & substr(Platform, 1, 2) == 'PS')
+
+#View(playstation_top_games)
+View(playstation_franchise_catalog)
+sum(playstation_franchise_catalog$Global_Sales)
+```
+
+Top Xbox:
+
+```{r}
+xbox_top_games <- filter(vg_sales, substr(Platform, 1, 1) == 'X')
+xbox_franchise_catalog <- filter(vg_sales, grepl('Halo', Name) & substr(Platform, 1, 1) == 'X')
+
+#View(xbox_top_games)
+View(xbox_franchise_catalog)
+sum(xbox_franchise_catalog$Global_Sales)
+```
+
+Top PC:
+
+```{r}
+pc_top_games <- filter(vg_sales, Platform == 'PC')
+pc_franchise_catalog <- filter(vg_sales, grepl('The Sims', Name) & Platform == 'PC')
+
+#View(pc_top_games)
+View(pc_franchise_catalog)
+sum(pc_franchise_catalog$Global_Sales)
+
+
+```
